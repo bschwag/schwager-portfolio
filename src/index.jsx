@@ -75,7 +75,7 @@ export default function Portfolio() {
       company: 'Mendi',
       title: 'Co-founder & Chief Creative Officer',
       timeframe: '2019–2022',
-      summary: '$650K first-year revenue. Scaled a Portland recipe to gold medals at the World Games.',
+      summary: 'Took a homegrown Portland recipe to the world stage. Built everything from scratch — brand, packaging, and every story in between.',
     },
     {
       company: 'Slingshot Sports',
@@ -118,7 +118,7 @@ export default function Portfolio() {
     {
       label: 'Mendi — full brand case study',
       status: 'building',
-      detail: 'Co-founder story, $650K launch year, World Games gold medal',
+      detail: 'Co-founder story, 0-to-1 brand build, World Games gold medal',
     },
     {
       label: 'evo — campaign creative showcase',
