@@ -1,21 +1,45 @@
 import React, { useState } from 'react';
-import { Menu, X, Mail, Linkedin, ArrowRight, Check } from 'lucide-react';
+import { Menu, X, Linkedin, ArrowRight, Check, Send } from 'lucide-react';
+
+const reelImages = [
+  { src: '/images/reel/evo-wff-25-poster.jpg',             label: "evo — Women's Film Fest '25" },
+  { src: '/images/reel/evo-just-roll-up-poster.jpg',       label: 'evo — Just Roll Up' },
+  { src: '/images/reel/evo-just-roll-up.jpg',              label: 'evo — Just Roll Up' },
+  { src: '/images/reel/evo-share-the-goods-campaign.jpg',  label: 'evo — Share the Goods' },
+  { src: '/images/reel/evo-share-the-goods.jpg',           label: 'evo — Share the Goods' },
+  { src: '/images/reel/evo-the-callaghan-site.jpg',        label: 'evo — The Callaghan' },
+  { src: '/images/reel/evo-trail-paid.jpg',                label: 'evo — Trail Running' },
+  { src: '/images/reel/evo-winter-storytelling.jpg',       label: 'evo — Winter Storytelling' },
+  { src: '/images/reel/mendi-athlete-campaign.jpg',        label: 'Mendi — Athlete Campaign' },
+  { src: '/images/reel/schwager-inc-evo-timeline.jpg',     label: 'Schwager Inc. — evo Timeline' },
+  { src: '/images/reel/turnstyle-evo-apparel.jpg',         label: 'Turnstyle — evo Apparel' },
+  { src: '/images/reel/brimstone-bizcards.jpg',            label: 'Schwager Inc. — Brimstone' },
+  { src: '/images/reel/brimstone-boulders-identity.jpg',   label: 'Schwager Inc. — Brimstone Boulders' },
+  { src: '/images/reel/ceder-speedster-identity.jpg',      label: 'Schwager Inc. — Ceder Speedster' },
+  { src: '/images/reel/alpine-lakes-identity.jpg',         label: 'Alpine Lakes — Identity' },
+  { src: '/images/reel/oso-verde-merch.jpg',               label: 'Schwager Inc. — Oso Verde' },
+  { src: '/images/reel/oso-verde-packaging.jpg',           label: 'Schwager Inc. — Oso Verde' },
+  { src: '/images/reel/saga-biz-cards.jpg',                label: 'Schwager Inc. — Saga' },
+  { src: '/images/reel/marination-label.png',              label: 'Schwager Inc. — Marination' },
+  { src: '/images/reel/kickin-boot-logo.png',              label: "Schwager Inc. — Kickin' Boot" },
+  { src: '/images/reel/wave-logo.png',                     label: 'Schwager Inc. — Wave' },
+  { src: '/images/reel/turnstyle-southland.jpg',           label: 'Turnstyle — Southland' },
+];
 
 function PhotoStrip() {
-  const nums = [1, 2, 3, 4, 5, 6];
-  const doubled = [...nums, ...nums];
+  const doubled = [...reelImages, ...reelImages];
 
   return (
     <div className="overflow-hidden mt-14 -mx-6 md:-mx-0">
       <div className="flex gap-3 animate-marquee" style={{ width: 'max-content' }}>
-        {doubled.map((n, idx) => (
+        {doubled.map((img, idx) => (
           <div
             key={idx}
             className="w-60 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100"
           >
             <img
-              src={`/images/reel/image-${n}.jpg`}
-              alt=""
+              src={img.src}
+              alt={img.label}
               className="w-full h-full object-cover"
             />
           </div>
@@ -52,6 +76,114 @@ function BuildItem({ label, status, detail }) {
         </span>
       )}
     </div>
+  );
+}
+
+function ContactForm() {
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('idle'); // idle | submitting | success | error
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('submitting');
+    try {
+      const res = await fetch('https://formspree.io/f/xykodkzr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setStatus('success');
+        setForm({ name: '', email: '', message: '' });
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  if (status === 'success') {
+    return (
+      <div className="flex flex-col items-start gap-3 py-8">
+        <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center">
+          <Check size={20} className="text-green-500" strokeWidth={3} />
+        </div>
+        <h3 className="text-title-lg font-bold">Message sent!</h3>
+        <p className="text-body-md text-gray-500">Thanks for reaching out — I'll get back to you soon.</p>
+        <button
+          onClick={() => setStatus('idle')}
+          className="text-label-lg font-semibold text-orange-500 hover:text-orange-600 transition mt-2"
+        >
+          Send another →
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="name" className="text-label-sm font-semibold text-gray-500 uppercase tracking-wide">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Your name"
+            className="px-4 py-3 border border-gray-200 rounded-lg text-body-md focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition"
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="email" className="text-label-sm font-semibold text-gray-500 uppercase tracking-wide">
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+            className="px-4 py-3 border border-gray-200 rounded-lg text-body-md focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="message" className="text-label-sm font-semibold text-gray-500 uppercase tracking-wide">
+          Message
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          required
+          rows={5}
+          value={form.message}
+          onChange={handleChange}
+          placeholder="Tell me about your project..."
+          className="px-4 py-3 border border-gray-200 rounded-lg text-body-md focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition resize-none"
+        />
+      </div>
+      {status === 'error' && (
+        <p className="text-label-sm text-red-500">Something went wrong — try again or reach out on LinkedIn.</p>
+      )}
+      <button
+        type="submit"
+        disabled={status === 'submitting'}
+        className="self-start inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition text-label-lg disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {status === 'submitting' ? 'Sending…' : 'Send Message'}
+        <Send size={15} />
+      </button>
+    </form>
   );
 }
 
@@ -252,20 +384,20 @@ export default function Portfolio() {
             </a>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
+            {reelImages.map((img, n) => (
               <div
                 key={n}
                 className="group relative overflow-hidden rounded-xl bg-gray-200"
                 style={{ aspectRatio: '4/3' }}
               >
                 <img
-                  src={`/images/reel/image-${n}.jpg`}
-                  alt=""
+                  src={img.src}
+                  alt={img.label}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                   <span className="text-white text-label-sm font-medium tracking-wide">
-                    Case study coming soon
+                    {img.label}
                   </span>
                 </div>
               </div>
@@ -294,31 +426,18 @@ export default function Portfolio() {
       {/* Contact */}
       <section id="contact" className="bg-gray-50 py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-xl">
+          <div className="max-w-2xl">
             <h2 className="text-headline-lg font-bold mb-4">Let's Work Together</h2>
             <p className="text-body-lg text-gray-600 mb-10">
               Looking for a creative partner to kickstart your next project or scale your in-house team? Let's talk.
             </p>
-            <div className="flex flex-col gap-5">
-              <a
-                href="mailto:brettschwager@gmail.com"
-                className="flex items-center gap-4 group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                  <Mail size={20} className="text-orange-500 group-hover:text-white transition-colors" />
-                </div>
-                <div>
-                  <p className="text-label-sm text-gray-400 font-medium uppercase tracking-wide">Email</p>
-                  <p className="text-title-md font-semibold group-hover:text-orange-500 transition-colors">
-                    brettschwager@gmail.com
-                  </p>
-                </div>
-              </a>
+            <ContactForm />
+            <div className="mt-10 pt-8 border-t border-gray-200">
               <a
                 href="https://linkedin.com/in/brettschwager"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 group"
+                className="flex items-center gap-4 group w-fit"
               >
                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
                   <Linkedin size={20} className="text-blue-600 group-hover:text-white transition-colors" />
