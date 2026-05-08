@@ -22,8 +22,8 @@ const reelImages = [
   { src: '/images/reel/oso-verde-packaging.jpg',           label: 'Schwager Inc. — Oso Verde' },
   { src: '/images/reel/saga-biz-cards.jpg',                label: 'Schwager Inc. — Saga' },
   { src: '/images/reel/marination-label.png',              label: 'Schwager Inc. — Marination' },
-  { src: '/images/reel/kickin-boot-logo.png',              label: "Schwager Inc. — Kickin' Boot" },
-  { src: '/images/reel/wave-logo.png',                     label: 'Schwager Inc. — Wave' },
+  { src: '/images/reel/kickin-boot-logo.png',              label: "Schwager Inc. — Kickin' Boot", isLogo: true, logoBg: '#1C1B18' },
+  { src: '/images/reel/wave-logo.png',                     label: 'Schwager Inc. — Wave',          isLogo: true, logoBg: '#252420' },
   { src: '/images/reel/turnstyle-southland.jpg',           label: 'Turnstyle — Southland' },
 ];
 
@@ -35,7 +35,7 @@ function PhotoStrip() {
       <div className="flex gap-3 animate-marquee" style={{ width: 'max-content' }}>
         {doubled.map((img, idx) => (
           <div key={idx} className="w-60 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100">
-            <img src={img.src} alt={img.label} className="w-full h-full object-cover" />
+            <img src={img.src} alt={img.label} className="w-full h-full object-cover object-center" />
           </div>
         ))}
       </div>
@@ -292,8 +292,14 @@ export default function Portfolio() {
           {/* Photo grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {reelImages.map((img, n) => (
-              <div key={n} className="group relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: '4/3' }}>
-                <img src={img.src} alt={img.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div key={n} className="group relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: '4/3', backgroundColor: img.logoBg || undefined }}>
+                <img
+                  src={img.src}
+                  alt={img.label}
+                  className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                    img.isLogo ? 'object-contain p-8' : 'object-cover object-center'
+                  }`}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                   <span className="text-white text-label-sm font-medium tracking-wide">{img.label}</span>
                 </div>
