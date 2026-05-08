@@ -29,7 +29,7 @@ module.exports = {
         'label-sm': ['0.6875rem',{ lineHeight: '1.45', letterSpacing: '0.05em' }],
       },
       animation: {
-        marquee: 'marquee 110s linear infinite',
+        marquee: 'marquee 40s linear infinite',
       },
       keyframes: {
         marquee: {
