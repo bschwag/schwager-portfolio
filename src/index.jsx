@@ -34,7 +34,7 @@ function PhotoStrip() {
     <div className="overflow-hidden mt-14 -mx-6 md:-mx-0">
       <div className="flex gap-3 animate-marquee" style={{ width: 'max-content' }}>
         {doubled.map((img, idx) => (
-          <div key={idx} className="w-60 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
+          <div key={idx} className="w-60 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100">
             <img src={img.src} alt={img.label} className="w-full h-full object-cover" />
           </div>
         ))}
@@ -45,27 +45,27 @@ function PhotoStrip() {
 
 function BuildItem({ label, status, detail }) {
   return (
-    <div className="flex items-start gap-4 py-4 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-4 py-4 border-b border-border-default last:border-0">
       <div className={`mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${
-        status === 'live'     ? 'bg-green-500' :
-        status === 'building' ? 'bg-orange-400' :
-                                'border-2 border-gray-200'
+        status === 'live'     ? 'bg-semantic-success-base' :
+        status === 'building' ? 'bg-brand-primary' :
+                                'border-2 border-border-default'
       }`}>
         {status === 'live'     && <Check size={11} color="white" strokeWidth={3} />}
         {status === 'building' && <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />}
       </div>
       <div className="flex-1 min-w-0">
         <p className={`font-semibold text-title-sm ${
-          status === 'building' ? 'text-orange-600' :
-          status === 'next'     ? 'text-gray-400'   :
-                                  'text-gray-900'
+          status === 'building' ? 'text-brand-primary' :
+          status === 'next'     ? 'text-text-muted'   :
+                                  'text-text-primary'
         }`}>
           {label}
         </p>
-        {detail && <p className="text-body-sm text-gray-400 mt-0.5">{detail}</p>}
+        {detail && <p className="text-body-sm text-text-muted mt-0.5">{detail}</p>}
       </div>
       {status === 'building' && (
-        <span className="flex-shrink-0 text-label-sm font-semibold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">
+        <span className="flex-shrink-0 text-label-sm font-semibold text-brand-primary bg-neutral-100 px-2.5 py-1 rounded-full">
           In progress
         </span>
       )}
@@ -102,12 +102,12 @@ function ContactForm() {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-start gap-3 py-8">
-        <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center">
-          <Check size={20} className="text-green-500" strokeWidth={3} />
+        <div className="w-12 h-12 rounded-xl bg-semantic-success-light flex items-center justify-center">
+          <Check size={20} className="text-semantic-success-base" strokeWidth={3} />
         </div>
         <h3 className="text-title-lg font-bold">Message sent!</h3>
-        <p className="text-body-md text-gray-500">Thanks for reaching out — I'll get back to you soon.</p>
-        <button onClick={() => setStatus('idle')} className="text-label-lg font-semibold text-orange-500 hover:text-orange-600 transition mt-2">
+        <p className="text-body-md text-text-secondary">Thanks for reaching out — I'll get back to you soon.</p>
+        <button onClick={() => setStatus('idle')} className="text-label-lg font-semibold text-brand-primary hover:text-brand-primary-hover transition mt-2">
           Send another →
         </button>
       </div>
@@ -118,26 +118,26 @@ function ContactForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="name" className="text-label-sm font-semibold text-gray-500 uppercase tracking-wide">Name</label>
+          <label htmlFor="name" className="text-label-sm font-semibold text-text-muted uppercase tracking-wide">Name</label>
           <input id="name" name="name" type="text" required value={form.name} onChange={handleChange} placeholder="Your name"
-            className="px-4 py-3 border border-gray-200 rounded-lg text-body-md focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" />
+            className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-label-sm font-semibold text-gray-500 uppercase tracking-wide">Email</label>
+          <label htmlFor="email" className="text-label-sm font-semibold text-text-muted uppercase tracking-wide">Email</label>
           <input id="email" name="email" type="email" required value={form.email} onChange={handleChange} placeholder="you@example.com"
-            className="px-4 py-3 border border-gray-200 rounded-lg text-body-md focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" />
+            className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition" />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="message" className="text-label-sm font-semibold text-gray-500 uppercase tracking-wide">Message</label>
+        <label htmlFor="message" className="text-label-sm font-semibold text-text-muted uppercase tracking-wide">Message</label>
         <textarea id="message" name="message" required rows={5} value={form.message} onChange={handleChange} placeholder="Tell me about your project..."
-          className="px-4 py-3 border border-gray-200 rounded-lg text-body-md focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition resize-none" />
+          className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition resize-none" />
       </div>
       {status === 'error' && (
-        <p className="text-label-sm text-red-500">Something went wrong — try again or reach out on LinkedIn.</p>
+        <p className="text-label-sm text-semantic-error-base">Something went wrong — try again or reach out on LinkedIn.</p>
       )}
       <button type="submit" disabled={status === 'submitting'}
-        className="self-start inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition text-label-lg disabled:opacity-60 disabled:cursor-not-allowed">
+        className="self-start inline-flex items-center gap-2 px-6 py-3 bg-brand-primary text-text-inverse font-semibold rounded-lg hover:bg-brand-primary-hover transition text-label-lg disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed">
         {status === 'submitting' ? 'Sending…' : 'Send Message'}
         <Send size={15} />
       </button>
@@ -169,54 +169,54 @@ export default function Portfolio() {
   ];
 
   return (
-    <div className="bg-white text-gray-900">
+    <div className="bg-bg-base text-text-primary">
 
       {/* Progress banner */}
-      <div className="bg-gray-900 text-white py-2.5 px-6 text-center">
-        <p className="text-label-sm tracking-wide text-gray-300">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-400 mr-2 align-middle animate-pulse" />
+      <div className="bg-bg-dark text-text-inverse py-2.5 px-6 text-center">
+        <p className="text-label-sm tracking-wide text-neutral-400">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-secondary mr-2 align-middle animate-pulse" />
           Portfolio in progress — building in public.
-          <a href="#building" className="ml-2 text-orange-400 hover:text-orange-300 transition underline underline-offset-2">
+          <a href="#building" className="ml-2 text-brand-secondary hover:opacity-80 transition underline underline-offset-2">
             See what's coming →
           </a>
         </p>
       </div>
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
+      <nav className="sticky top-0 z-50 bg-nav-bg/95 backdrop-blur border-b border-nav-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <a href="#" className="text-title-lg font-bold tracking-tight">
-            Brett<span className="text-orange-500">.</span>
+          <a href="#" className="text-title-lg font-bold tracking-tight text-nav-text">
+            Brett<span className="text-nav-text-active">.</span>
           </a>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-1">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-1 text-nav-text">
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          <div className={`${mobileMenuOpen ? 'flex' : 'hidden'} md:flex gap-7 absolute md:relative top-full left-0 right-0 md:top-auto md:left-auto flex-col md:flex-row bg-white md:bg-transparent p-6 md:p-0 border-b md:border-0 text-label-lg font-medium`}>
-            <a href="#experience" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 transition">Experience</a>
-            <a href="#work"       onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 transition">Work</a>
-            <a href="#building"   onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 transition">What's Building</a>
-            <a href="#contact"    onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 transition">Contact</a>
+          <div className={`${mobileMenuOpen ? 'flex' : 'hidden'} md:flex gap-7 absolute md:relative top-full left-0 right-0 md:top-auto md:left-auto flex-col md:flex-row bg-nav-bg md:bg-transparent p-6 md:p-0 border-b border-nav-border md:border-0 text-label-lg font-medium text-nav-text`}>
+            <a href="#experience" onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Experience</a>
+            <a href="#work"       onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Work</a>
+            <a href="#building"   onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">What's Building</a>
+            <a href="#contact"    onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Contact</a>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-6 pt-20 md:pt-28 pb-0 overflow-hidden">
-        <p className="text-label-lg font-semibold text-orange-500 tracking-widest uppercase mb-5">
+        <p className="text-label-lg font-semibold text-brand-primary tracking-widest uppercase mb-5">
           Brett Schwager — Hood River, OR
         </p>
         <h1 className="text-display-lg font-bold leading-[1.05] mb-7 max-w-2xl">
           Creative<br />Generalist.
         </h1>
-        <p className="text-body-lg text-gray-500 mb-9 max-w-lg leading-relaxed">
+        <p className="text-body-lg text-text-secondary mb-9 max-w-lg leading-relaxed">
           20 years designing brand stories that stick — across startups, agencies, and in-house teams.
           I work at the intersection of bold ideas and human connection.
         </p>
         <div className="flex gap-3 flex-wrap">
-          <a href="#experience" className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition text-label-lg">
+          <a href="#experience" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary text-text-inverse font-semibold rounded-lg hover:bg-brand-primary-hover transition text-label-lg">
             See Experience <ArrowRight size={15} />
           </a>
-          <a href="#contact" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-200 font-semibold rounded-lg hover:border-gray-900 hover:text-gray-900 transition text-label-lg text-gray-700">
+          <a href="#contact" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-brand-primary text-brand-primary font-semibold rounded-lg hover:bg-brand-primary hover:text-text-inverse transition text-label-lg">
             Get in Touch
           </a>
         </div>
@@ -227,20 +227,20 @@ export default function Portfolio() {
       <section id="experience" className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-headline-lg font-bold mb-14">Experience</h2>
-          <div className="grid md:grid-cols-2 border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+          <div className="grid md:grid-cols-2 border border-border-default rounded-2xl overflow-hidden shadow-sm">
             {experience.map((role, idx) => (
               <div
                 key={idx}
-                className={`p-7 bg-white hover:bg-gray-50 transition-colors ${idx % 2 === 0 ? 'md:border-r border-gray-100' : ''} ${idx < experience.length - 2 ? 'border-b border-gray-100' : ''}`}
+                className={`p-7 bg-bg-base hover:bg-bg-subtle transition-colors ${idx % 2 === 0 ? 'md:border-r border-border-default' : ''} ${idx < experience.length - 2 ? 'border-b border-border-default' : ''}`}
               >
                 <div className="flex justify-between items-start gap-4 mb-2.5">
                   <div>
                     <h3 className="text-title-lg font-bold">{role.company}</h3>
-                    <p className="text-title-sm text-gray-500 mt-0.5">{role.title}</p>
+                    <p className="text-title-sm text-text-muted mt-0.5">{role.title}</p>
                   </div>
-                  <span className="text-label-sm font-semibold text-gray-400 flex-shrink-0 pt-0.5">{role.timeframe}</span>
+                  <span className="text-label-sm font-semibold text-text-muted flex-shrink-0 pt-0.5">{role.timeframe}</span>
                 </div>
-                <p className="text-body-md text-gray-600 leading-relaxed">{role.summary}</p>
+                <p className="text-body-md text-text-secondary leading-relaxed">{role.summary}</p>
               </div>
             ))}
           </div>
@@ -248,14 +248,14 @@ export default function Portfolio() {
       </section>
 
       {/* Work */}
-      <section id="work" className="bg-gray-50 py-20 md:py-32">
+      <section id="work" className="bg-bg-subtle py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-end justify-between mb-12 gap-4 flex-wrap">
             <div>
               <h2 className="text-headline-lg font-bold">Work</h2>
-              <p className="text-body-lg text-gray-500 mt-2">Case studies — more coming soon.</p>
+              <p className="text-body-lg text-text-secondary mt-2">Case studies — more coming soon.</p>
             </div>
-            <a href="#building" className="text-label-lg font-semibold text-orange-500 hover:text-orange-600 transition flex-shrink-0">
+            <a href="#building" className="text-label-lg font-semibold text-brand-primary hover:text-brand-primary-hover transition flex-shrink-0">
               See full build log →
             </a>
           </div>
@@ -292,7 +292,7 @@ export default function Portfolio() {
           {/* Photo grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {reelImages.map((img, n) => (
-              <div key={n} className="group relative overflow-hidden rounded-xl bg-gray-200" style={{ aspectRatio: '4/3' }}>
+              <div key={n} className="group relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: '4/3' }}>
                 <img src={img.src} alt={img.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                   <span className="text-white text-label-sm font-medium tracking-wide">{img.label}</span>
@@ -308,10 +308,10 @@ export default function Portfolio() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-2xl">
             <h2 className="text-headline-lg font-bold mb-3">What's Building</h2>
-            <p className="text-body-lg text-gray-500 mb-12">
+            <p className="text-body-lg text-text-secondary mb-12">
               This portfolio is being assembled in public. Here's the exact status of each piece.
             </p>
-            <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm bg-white px-6">
+            <div className="border border-border-default rounded-2xl overflow-hidden shadow-sm bg-bg-base px-6">
               {buildItems.map((item, idx) => (
                 <BuildItem key={idx} {...item} />
               ))}
@@ -321,21 +321,21 @@ export default function Portfolio() {
       </section>
 
       {/* Contact */}
-      <section id="contact" className="bg-gray-50 py-20 md:py-32">
+      <section id="contact" className="bg-bg-subtle py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-2xl">
             <h2 className="text-headline-lg font-bold mb-4">Let's Work Together</h2>
-            <p className="text-body-lg text-gray-600 mb-10">
+            <p className="text-body-lg text-text-secondary mb-10">
               Looking for a creative partner to kickstart your next project or scale your in-house team? Let's talk.
             </p>
             <ContactForm />
-            <div className="mt-10 pt-8 border-t border-gray-200">
+            <div className="mt-10 pt-8 border-t border-border-default">
               <a href="https://linkedin.com/in/brettschwager" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group w-fit">
                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
                   <Linkedin size={20} className="text-blue-600 group-hover:text-white transition-colors" />
                 </div>
                 <div>
-                  <p className="text-label-sm text-gray-400 font-medium uppercase tracking-wide">LinkedIn</p>
+                  <p className="text-label-sm text-text-muted font-medium uppercase tracking-wide">LinkedIn</p>
                   <p className="text-title-md font-semibold group-hover:text-blue-600 transition-colors">/in/brettschwager</p>
                 </div>
               </a>
@@ -345,11 +345,11 @@ export default function Portfolio() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-10">
+      <footer className="bg-bg-dark text-text-inverse py-10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-title-lg font-bold">Brett<span className="text-orange-500">.</span></span>
-          <p className="text-gray-500 text-label-lg">Designed & built by Brett. Hood River, OR.</p>
-          <p className="text-gray-600 text-label-sm">Portfolio in progress — {new Date().getFullYear()}</p>
+          <span className="text-title-lg font-bold">Brett<span className="text-brand-secondary">.</span></span>
+          <p className="text-neutral-500 text-label-lg">Designed & built by Brett. Hood River, OR.</p>
+          <p className="text-neutral-600 text-label-sm">Portfolio in progress — {new Date().getFullYear()}</p>
         </div>
       </footer>
 
