@@ -22,8 +22,8 @@ const reelImages = [
   { src: '/images/reel/oso-verde-packaging.jpg',           label: 'Schwager Inc. — Oso Verde' },
   { src: '/images/reel/saga-biz-cards.jpg',                label: 'Schwager Inc. — Saga' },
   { src: '/images/reel/marination-label.png',              label: 'Schwager Inc. — Marination' },
-  { src: '/images/reel/kickin-boot-logo.png',              label: "Schwager Inc. — Kickin' Boot", isLogo: true, logoBg: '#1C1B18' },
-  { src: '/images/reel/wave-logo.png',                     label: 'Schwager Inc. — Wave',          isLogo: true, logoBg: '#252420' },
+  { src: '/images/reel/kickin-boot-logo.jpg',              label: "Schwager Inc. — Kickin' Boot" },
+  { src: '/images/reel/wave-logo.jpg',                     label: 'Schwager Inc. — Wave' },
   { src: '/images/reel/turnstyle-southland.jpg',           label: 'Turnstyle — Southland' },
 ];
 
