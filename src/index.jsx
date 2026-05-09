@@ -1,77 +1,235 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Linkedin, ArrowRight, Check, Send } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Menu, X, Linkedin, ArrowRight, Check, Send, ChevronLeft, ChevronRight } from 'lucide-react';
+import { heroImages, chapters } from './data.js';
 
-const reelImages = [
-  { src: '/images/reel/evo-wff-25-poster.jpg',             label: "evo — Women's Film Fest '25" },
-  { src: '/images/reel/evo-just-roll-up-poster.jpg',       label: 'evo — Just Roll Up' },
-  { src: '/images/reel/evo-just-roll-up.jpg',              label: 'evo — Just Roll Up' },
-  { src: '/images/reel/evo-share-the-goods-campaign.jpg',  label: 'evo — Share the Goods' },
-  { src: '/images/reel/evo-share-the-goods.jpg',           label: 'evo — Share the Goods' },
-  { src: '/images/reel/evo-the-callaghan-site.jpg',        label: 'evo — The Callaghan' },
-  { src: '/images/reel/evo-trail-paid.jpg',                label: 'evo — Trail Running' },
-  { src: '/images/reel/evo-winter-storytelling.jpg',       label: 'evo — Winter Storytelling' },
-  { src: '/images/reel/mendi-athlete-campaign.jpg',        label: 'Mendi — Athlete Campaign' },
-  { src: '/images/reel/schwager-inc-evo-timeline.jpg',     label: 'Schwager Inc. — evo Timeline' },
-  { src: '/images/reel/turnstyle-evo-apparel.jpg',         label: 'Turnstyle — evo Apparel' },
-  { src: '/images/reel/brimstone-bizcards.jpg',            label: 'Schwager Inc. — Brimstone' },
-  { src: '/images/reel/brimstone-boulders-identity.jpg',   label: 'Schwager Inc. — Brimstone Boulders' },
-  { src: '/images/reel/ceder-speedster-identity.jpg',      label: 'Schwager Inc. — Ceder Speedster' },
-  { src: '/images/reel/alpine-lakes-identity.jpg',         label: 'Alpine Lakes — Identity' },
-  { src: '/images/reel/oso-verde-merch.jpg',               label: 'Schwager Inc. — Oso Verde' },
-  { src: '/images/reel/oso-verde-packaging.jpg',           label: 'Schwager Inc. — Oso Verde' },
-  { src: '/images/reel/saga-biz-cards.jpg',                label: 'Schwager Inc. — Saga' },
-  { src: '/images/reel/marination-label.png',              label: 'Schwager Inc. — Marination' },
-  { src: '/images/reel/kickin-boot-logo.jpg',              label: "Schwager Inc. — Kickin' Boot" },
-  { src: '/images/reel/wave-logo.jpg',                     label: 'Schwager Inc. — Wave' },
-  { src: '/images/reel/turnstyle-southland.jpg',           label: 'Turnstyle — Southland' },
-];
+// ---------------------------------------------------------------------------
+// Lightbox
+// ---------------------------------------------------------------------------
 
-function PhotoStrip() {
-  const doubled = [...reelImages, ...reelImages];
+function Lightbox({ image, onClose, onPrev, onNext, hasPrev, hasNext }) {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft'  && hasPrev) onPrev();
+      if (e.key === 'ArrowRight' && hasNext) onNext();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose, onPrev, onNext, hasPrev, hasNext]);
 
   return (
-    <div className="overflow-hidden mt-14 -mx-6 md:-mx-0">
-      <div className="flex gap-3 animate-marquee" style={{ width: 'max-content' }}>
-        {doubled.map((img, idx) => (
-          <div key={idx} className="w-60 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100">
-            <img src={img.src} alt={img.label} className="w-full h-full object-cover object-center" />
-          </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-white"
+        aria-label="Close"
+      >
+        <X size={18} />
+      </button>
+
+      {hasPrev && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onPrev(); }}
+          className="absolute left-4 md:left-8 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-white"
+          aria-label="Previous"
+        >
+          <ChevronLeft size={20} />
+        </button>
+      )}
+
+      {hasNext && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onNext(); }}
+          className="absolute right-4 md:right-8 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-white"
+          aria-label="Next"
+        >
+          <ChevronRight size={20} />
+        </button>
+      )}
+
+      <div
+        className="max-w-5xl w-full mx-8 flex flex-col items-center gap-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={image.src}
+          alt={image.caption}
+          className="max-h-[80vh] w-full object-contain rounded-lg"
+        />
+        <p className="text-white/60 text-label-sm tracking-wide">{image.caption}</p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Hero Slideshow
+// ---------------------------------------------------------------------------
+
+function HeroSlideshow() {
+  const [current, setCurrent] = useState(0);
+  const [fading, setFading] = useState(false);
+
+  const goTo = useCallback((idx) => {
+    setFading(true);
+    setTimeout(() => {
+      setCurrent(idx);
+      setFading(false);
+    }, 400);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      goTo((current + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [current, goTo]);
+
+  const img = heroImages[current];
+
+  return (
+    <section className="relative w-full h-screen min-h-[600px] overflow-hidden bg-bg-dark">
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+        style={{
+          backgroundImage: `url(${img.src})`,
+          opacity: fading ? 0 : 1,
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+
+      {/* Caption */}
+      <p
+        className="absolute bottom-28 right-8 md:right-12 text-white/40 text-label-sm tracking-widest uppercase transition-opacity duration-400"
+        style={{ opacity: fading ? 0 : 1 }}
+      >
+        {img.caption}
+      </p>
+
+      {/* Progress dots */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
+        {heroImages.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`w-1.5 h-1.5 rounded-full transition-all ${i === current ? 'bg-white w-5' : 'bg-white/30'}`}
+            aria-label={`Slide ${i + 1}`}
+          />
         ))}
       </div>
-    </div>
+
+      {/* Hero copy + CTAs */}
+      <div className="absolute inset-0 flex flex-col justify-end pb-32 px-8 md:px-16 max-w-4xl">
+        <p className="text-brand-secondary text-label-lg font-semibold tracking-widest uppercase mb-4">
+          Brett Schwager
+        </p>
+        <h1 className="text-display-lg md:text-[5rem] font-bold text-white leading-[1.0] mb-4 tracking-tight">
+          Creative Leader<br />&amp; Designer
+        </h1>
+        <p className="text-body-lg text-white/70 mb-8 max-w-md leading-relaxed">
+          20 years of helping teams build soulful brands.
+        </p>
+        <div className="flex gap-3 flex-wrap">
+          <a
+            href="#experience"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-secondary text-bg-dark font-semibold rounded-lg hover:opacity-90 transition text-label-lg"
+          >
+            See Experience <ArrowRight size={15} />
+          </a>
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-lg hover:border-white hover:bg-white/10 transition text-label-lg"
+          >
+            Get in Touch
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function BuildItem({ label, status, detail }) {
+// ---------------------------------------------------------------------------
+// Chapter Section
+// ---------------------------------------------------------------------------
+
+function ChapterSection({ chapter, onImageClick }) {
+  const isDark = chapter.number === '02';
+
   return (
-    <div className="flex items-start gap-4 py-4 border-b border-border-default last:border-0">
-      <div className={`mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${
-        status === 'live'     ? 'bg-semantic-success-base' :
-        status === 'building' ? 'bg-brand-primary' :
-                                'border-2 border-border-default'
-      }`}>
-        {status === 'live'     && <Check size={11} color="white" strokeWidth={3} />}
-        {status === 'building' && <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className={`font-semibold text-title-sm ${
-          status === 'building' ? 'text-brand-primary' :
-          status === 'next'     ? 'text-text-muted'   :
-                                  'text-text-primary'
-        }`}>
-          {label}
+    <section
+      id={chapter.id}
+      className={`py-20 md:py-32 ${isDark ? 'bg-bg-dark text-text-inverse' : 'bg-bg-base text-text-primary'}`}
+    >
+      <div className="max-w-7xl mx-auto px-6 md:px-10">
+        {/* Chapter header */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+          <div className="flex items-start gap-5">
+            <span className={`text-[6rem] font-bold leading-none select-none mt-1 ${isDark ? 'text-white/10' : 'text-neutral-100'}`}>
+              {chapter.number}
+            </span>
+            <div>
+              <p className={`text-label-sm font-semibold tracking-widest uppercase mb-1 ${isDark ? 'text-brand-secondary' : 'text-brand-primary'}`}>
+                {chapter.timeframe}
+              </p>
+              <h2 className="text-headline-lg font-bold">{chapter.company}</h2>
+              <p className={`text-label-lg font-medium mt-1 ${isDark ? 'text-white/50' : 'text-text-muted'}`}>
+                {chapter.role}
+              </p>
+            </div>
+          </div>
+          <p className={`text-body-lg max-w-md leading-relaxed ${isDark ? 'text-white/70' : 'text-text-secondary'}`}>
+            {chapter.summary}
+          </p>
+        </div>
+
+        {/* Punchy headline */}
+        <p className={`text-headline-md font-bold mb-12 max-w-2xl leading-snug ${isDark ? 'text-white' : 'text-text-primary'}`}>
+          {chapter.headline}
         </p>
-        {detail && <p className="text-body-sm text-text-muted mt-0.5">{detail}</p>}
+
+        {/* Thumbnail grid */}
+        {chapter.placeholder && chapter.images.length === 0 ? (
+          <div className={`rounded-2xl border-2 border-dashed px-8 py-16 text-center ${isDark ? 'border-white/10 text-white/30' : 'border-border-default text-text-muted'}`}>
+            <p className="text-label-lg font-medium">Visuals coming — pulling from archive.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {chapter.images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => onImageClick(chapter.id, i)}
+                className="group relative overflow-hidden rounded-xl bg-neutral-800 text-left"
+                style={{ aspectRatio: '4/3' }}
+                aria-label={img.caption}
+              >
+                <img
+                  src={img.src}
+                  alt={img.caption}
+                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <span className="text-white text-label-sm font-medium tracking-wide">{img.caption}</span>
+                </div>
+                {chapter.placeholder && (
+                  <div className="absolute top-2 right-2 bg-black/50 text-white/60 text-label-sm px-2 py-0.5 rounded">
+                    placeholder
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      {status === 'building' && (
-        <span className="flex-shrink-0 text-label-sm font-semibold text-brand-primary bg-neutral-100 px-2.5 py-1 rounded-full">
-          In progress
-        </span>
-      )}
-    </div>
+    </section>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Contact Form
+// ---------------------------------------------------------------------------
 
 function ContactForm() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -120,18 +278,18 @@ function ContactForm() {
         <div className="flex flex-col gap-1.5">
           <label htmlFor="name" className="text-label-sm font-semibold text-text-muted uppercase tracking-wide">Name</label>
           <input id="name" name="name" type="text" required value={form.name} onChange={handleChange} placeholder="Your name"
-            className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition" />
+            className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition bg-bg-base" />
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="email" className="text-label-sm font-semibold text-text-muted uppercase tracking-wide">Email</label>
           <input id="email" name="email" type="email" required value={form.email} onChange={handleChange} placeholder="you@example.com"
-            className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition" />
+            className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition bg-bg-base" />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor="message" className="text-label-sm font-semibold text-text-muted uppercase tracking-wide">Message</label>
         <textarea id="message" name="message" required rows={5} value={form.message} onChange={handleChange} placeholder="Tell me about your project..."
-          className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition resize-none" />
+          className="px-4 py-3 border border-border-default rounded-lg text-body-md focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition resize-none bg-bg-base" />
       </div>
       {status === 'error' && (
         <p className="text-label-sm text-semantic-error-base">Something went wrong — try again or reach out on LinkedIn.</p>
@@ -145,186 +303,71 @@ function ContactForm() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Main Portfolio
+// ---------------------------------------------------------------------------
+
 export default function Portfolio() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [lightbox, setLightbox] = useState(null); // { chapterId, index }
 
-  const experience = [
-    { company: 'evo',                     title: 'Creative Manager',                   timeframe: '2022–Present', summary: 'Leading creative strategy and execution for global campaigns across retail, travel, hospitality, and community events.' },
-    { company: 'Schwager, Inc.',           title: 'Owner & Creative Director',          timeframe: '2014–Present', summary: 'Design practice spanning brand identity, packaging, and campaigns for Microsoft, evo, and Season.' },
-    { company: 'Mendi',                    title: 'Co-founder & Chief Creative Officer', timeframe: '2019–2022',   summary: 'Took a homegrown Portland recipe to the world stage. Built everything from scratch — brand, packaging, and every story in between.' },
-    { company: 'Slingshot Sports',         title: 'Creative Director',                  timeframe: '2013–2014',   summary: 'Led brand identity across Kite, Wake, and SUP segments working shoulder-to-shoulder with R&D.' },
-    { company: 'Turnstyle',                title: 'Senior Designer',                    timeframe: '2009–2013',   summary: "Brand, print, and interactive work across industries at one of Seattle's top design studios." },
-    { company: 'The Greenwood Collective', title: 'Co-founder',                         timeframe: '2007–2009',   summary: 'Started a Seattle creative space pre-WeWork. Proved grassroots coworking could work without a playbook.' },
-    { company: 'Engine Interactive',       title: 'Interaction Designer',               timeframe: '2006–2007',   summary: 'UX design for Expedia and Precor — bridging design and dev before it was cool or easy.' },
-    { company: 'Microsoft',                title: 'Interaction Designer',               timeframe: '2005–2006',   summary: 'UI and icon systems for LifeCam hardware, collaborating with researchers and industrial designers.' },
-  ];
+  const openLightbox = (chapterId, index) => setLightbox({ chapterId, index });
+  const closeLightbox = () => setLightbox(null);
 
-  const buildItems = [
-    { label: 'Site foundation — structure & type system',  status: 'live',     detail: 'Responsive layout, design tokens, component architecture' },
-    { label: 'evo — Trail Running case study',             status: 'live',     detail: 'Brand guidelines, photography direction, paid ads & email' },
-    { label: 'Mendi — full brand case study',              status: 'building', detail: 'Co-founder story, 0-to-1 brand build, World Games gold medal' },
-    { label: 'Schwager Inc. — freelance work archive',     status: 'next',     detail: 'Microsoft, Season, and a decade of client work' },
-    { label: 'Motion reel',                                status: 'next',     detail: 'Video compilation of select projects' },
-    { label: 'Writing & experiments',                      status: 'next',     detail: 'Process writing, design thinking, side projects' },
-  ];
+  const currentChapter = lightbox ? chapters.find((c) => c.id === lightbox.chapterId) : null;
+  const currentImages  = currentChapter?.images ?? [];
+
+  const prevImage = () => {
+    if (lightbox.index > 0) setLightbox({ ...lightbox, index: lightbox.index - 1 });
+  };
+  const nextImage = () => {
+    if (lightbox.index < currentImages.length - 1) setLightbox({ ...lightbox, index: lightbox.index + 1 });
+  };
 
   return (
     <div className="bg-bg-base text-text-primary">
 
-      {/* Progress banner */}
-      <div className="bg-bg-dark text-text-inverse py-2.5 px-6 text-center">
-        <p className="text-label-sm tracking-wide text-neutral-400">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-secondary mr-2 align-middle animate-pulse" />
-          Portfolio in progress — building in public.
-          <a href="#building" className="ml-2 text-brand-secondary hover:opacity-80 transition underline underline-offset-2">
-            See what's coming →
-          </a>
-        </p>
-      </div>
+      {/* Lightbox */}
+      {lightbox && currentImages[lightbox.index] && (
+        <Lightbox
+          image={currentImages[lightbox.index]}
+          onClose={closeLightbox}
+          onPrev={prevImage}
+          onNext={nextImage}
+          hasPrev={lightbox.index > 0}
+          hasNext={lightbox.index < currentImages.length - 1}
+        />
+      )}
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-nav-bg/95 backdrop-blur border-b border-nav-border">
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-bg-dark/90 backdrop-blur border-b border-nav-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <a href="#" className="text-title-lg font-bold tracking-tight text-nav-text">
-            Brett<span className="text-nav-text-active">.</span>
+          <a href="#" className="text-title-lg font-bold tracking-tight text-text-inverse">
+            Brett<span className="text-brand-secondary">.</span>
           </a>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-1 text-nav-text">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-1 text-text-inverse">
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          <div className={`${mobileMenuOpen ? 'flex' : 'hidden'} md:flex gap-7 absolute md:relative top-full left-0 right-0 md:top-auto md:left-auto flex-col md:flex-row bg-nav-bg md:bg-transparent p-6 md:p-0 border-b border-nav-border md:border-0 text-label-lg font-medium text-nav-text`}>
-            <a href="#experience" onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Experience</a>
-            <a href="#work"       onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Work</a>
-            <a href="#building"   onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">What's Building</a>
-            <a href="#contact"    onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Contact</a>
+          <div className={`${mobileMenuOpen ? 'flex' : 'hidden'} md:flex gap-7 absolute md:relative top-full left-0 right-0 md:top-auto md:left-auto flex-col md:flex-row bg-bg-dark md:bg-transparent p-6 md:p-0 border-b border-nav-border md:border-0 text-label-lg font-medium text-nav-text`}>
+            {chapters.map((c) => (
+              <a key={c.id} href={`#${c.id}`} onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">
+                {c.company}
+              </a>
+            ))}
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-nav-text-hover transition">Contact</a>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 pt-20 md:pt-28 pb-0 overflow-hidden">
-        <p className="text-label-lg font-semibold text-brand-primary tracking-widest uppercase mb-5">
-          Brett Schwager — Hood River, OR
-        </p>
-        <h1 className="text-display-lg font-bold leading-[1.05] mb-7 max-w-2xl">
-          Creative<br />Generalist.
-        </h1>
-        <p className="text-body-lg text-text-secondary mb-9 max-w-lg leading-relaxed">
-          20 years designing brand stories that stick — across startups, agencies, and in-house teams.
-          I work at the intersection of bold ideas and human connection.
-        </p>
-        <div className="flex gap-3 flex-wrap">
-          <a href="#experience" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary text-text-inverse font-semibold rounded-lg hover:bg-brand-primary-hover transition text-label-lg">
-            See Experience <ArrowRight size={15} />
-          </a>
-          <a href="#contact" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-brand-primary text-brand-primary font-semibold rounded-lg hover:bg-brand-primary hover:text-text-inverse transition text-label-lg">
-            Get in Touch
-          </a>
-        </div>
-        <PhotoStrip />
-      </section>
+      <HeroSlideshow />
 
-      {/* Experience */}
-      <section id="experience" className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-headline-lg font-bold mb-14">Experience</h2>
-          <div className="grid md:grid-cols-2 border border-border-default rounded-2xl overflow-hidden shadow-sm">
-            {experience.map((role, idx) => (
-              <div
-                key={idx}
-                className={`p-7 bg-bg-base hover:bg-bg-subtle transition-colors ${idx % 2 === 0 ? 'md:border-r border-border-default' : ''} ${idx < experience.length - 2 ? 'border-b border-border-default' : ''}`}
-              >
-                <div className="flex justify-between items-start gap-4 mb-2.5">
-                  <div>
-                    <h3 className="text-title-lg font-bold">{role.company}</h3>
-                    <p className="text-title-sm text-text-muted mt-0.5">{role.title}</p>
-                  </div>
-                  <span className="text-label-sm font-semibold text-text-muted flex-shrink-0 pt-0.5">{role.timeframe}</span>
-                </div>
-                <p className="text-body-md text-text-secondary leading-relaxed">{role.summary}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Work */}
-      <section id="work" className="bg-bg-subtle py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-12 gap-4 flex-wrap">
-            <div>
-              <h2 className="text-headline-lg font-bold">Work</h2>
-              <p className="text-body-lg text-text-secondary mt-2">Case studies — more coming soon.</p>
-            </div>
-            <a href="#building" className="text-label-lg font-semibold text-brand-primary hover:text-brand-primary-hover transition flex-shrink-0">
-              See full build log →
-            </a>
-          </div>
-
-          {/* Live case study */}
-          <Link to="/evo-trail" className="group block mb-4 rounded-2xl overflow-hidden bg-[#1A1A1A] relative" style={{ minHeight: '320px' }}>
-            <div
-              className="absolute inset-0 font-black uppercase leading-[0.85] tracking-tighter text-white/[0.04] flex items-center pl-10 select-none overflow-hidden"
-              style={{ fontSize: 'clamp(60px, 10vw, 140px)' }}
-            >
-              RUN<br />TRAIL<br />RIDE<br />TRAIL
-            </div>
-            <div className="relative z-10 p-8 md:p-12 flex flex-col justify-between" style={{ minHeight: '320px' }}>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-label-sm font-semibold text-[#D4E141] tracking-widest uppercase mb-2">evo — FW25</p>
-                  <h3 className="text-headline-sm font-bold text-white">Trail Running Campaign</h3>
-                  <p className="text-body-md text-white/50 mt-2 max-w-md">
-                    Brand guidelines, photography direction, paid ads, and email — introducing trail running as a new category.
-                  </p>
-                </div>
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[#D4E141] transition-colors">
-                  <ArrowRight size={16} className="text-white group-hover:text-[#1A1A1A] transition-colors" />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-8 flex-wrap">
-                {['Brand Strategy', 'Photography Direction', 'Paid Ads', 'Email', 'In-store'].map((tag) => (
-                  <span key={tag} className="text-label-sm font-medium text-white/40 bg-white/5 px-3 py-1 rounded-full border border-white/10">{tag}</span>
-                ))}
-              </div>
-            </div>
-          </Link>
-
-          {/* Photo grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {reelImages.map((img, n) => (
-              <div key={n} className="group relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: '4/3', backgroundColor: img.logoBg || undefined }}>
-                <img
-                  src={img.src}
-                  alt={img.label}
-                  className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
-                    img.isLogo ? 'object-contain p-8' : 'object-cover object-center'
-                  }`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                  <span className="text-white text-label-sm font-medium tracking-wide">{img.label}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What's Building */}
-      <section id="building" className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-2xl">
-            <h2 className="text-headline-lg font-bold mb-3">What's Building</h2>
-            <p className="text-body-lg text-text-secondary mb-12">
-              This portfolio is being assembled in public. Here's the exact status of each piece.
-            </p>
-            <div className="border border-border-default rounded-2xl overflow-hidden shadow-sm bg-bg-base px-6">
-              {buildItems.map((item, idx) => (
-                <BuildItem key={idx} {...item} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Chapters */}
+      <div id="experience">
+        {chapters.map((chapter) => (
+          <ChapterSection key={chapter.id} chapter={chapter} onImageClick={openLightbox} />
+        ))}
+      </div>
 
       {/* Contact */}
       <section id="contact" className="bg-bg-subtle py-20 md:py-32">
@@ -351,11 +394,14 @@ export default function Portfolio() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-bg-dark text-text-inverse py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <footer className="bg-bg-dark text-text-inverse py-14">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <span className="text-title-lg font-bold">Brett<span className="text-brand-secondary">.</span></span>
-          <p className="text-neutral-500 text-label-lg">Designed & built by Brett. Hood River, OR.</p>
-          <p className="text-neutral-600 text-label-sm">Portfolio in progress — {new Date().getFullYear()}</p>
+          <div className="flex flex-col gap-1 text-neutral-500 text-label-lg">
+            <p>Earlier career: Microsoft · Engine Interactive</p>
+            <p>Independent practice: <span className="text-neutral-400">Schwager Inc.</span> — ongoing</p>
+          </div>
+          <p className="text-neutral-600 text-label-sm">Hood River, OR · {new Date().getFullYear()}</p>
         </div>
       </footer>
 
